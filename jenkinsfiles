@@ -2,34 +2,31 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
+        stage('Build Docker Image') {
             steps {
-                echo 'Source code checked out from GitHub'
+                echo 'Building Docker image...'
+                sh 'docker build -t jenkins-demo .'
             }
         }
 
-        stage('Build') {
+        stage('Deploy Container') {
             steps {
-                echo 'Building the application...'
-                sh 'ls -la'
-            }
-        }
-
-        stage('Test') {
-            steps {
-                echo 'Testing the application...'
-                sh 'test -f index.html'
+                echo 'Deploying container...'
+                sh '''
+                    docker rm -f jenkins-demo-container || true
+                    docker run -d --name jenkins-demo-container -p 80:80 jenkins-demo
+                '''
             }
         }
     }
 
     post {
         success {
-            echo 'Pipeline completed successfully!'
+            echo 'Application deployed successfully!'
         }
 
         failure {
-            echo 'Pipeline failed!'
+            echo 'Deployment failed!'
         }
     }
 }
