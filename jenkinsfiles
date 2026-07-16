@@ -29,7 +29,7 @@ pipeline {
     steps {
         sshagent(['ec2-deploy-key']) {
             sh '''
-                ssh -o StrictHostKeyChecking=no ubuntu@<EC2-2-PRIVATE-IP> "
+                ssh -o StrictHostKeyChecking=no ubuntu@172.31.23.175 "
                     docker pull mubeenr7/jenkins-demo:latest &&
                     docker rm -f jenkins-demo-container || true &&
                     docker run -d \
