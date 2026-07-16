@@ -25,11 +25,21 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
-            steps {
-                sh 'docker rm -f jenkins-demo-container || true'
-                sh 'docker run -d -p 80:80 --name jenkins-demo-container $DOCKER_IMAGE'
-            }
+        stage('Deploy to EC2-2') {
+    steps {
+        sshagent(['ec2-deploy-key']) {
+            sh '''
+                ssh -o StrictHostKeyChecking=no ubuntu@<EC2-2-PRIVATE-IP> "
+                    docker pull mubeenr7/jenkins-demo:latest &&
+                    docker rm -f jenkins-demo-container || true &&
+                    docker run -d \
+                      --name jenkins-demo-container \
+                      -p 80:80 \
+                      mubeenr7/jenkins-demo:latest
+                "
+            '''
         }
+    }
+}
     }
 }
